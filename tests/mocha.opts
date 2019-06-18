@@ -1,0 +1,7 @@
+--colors
+--recursive
+--timeout 30000
+--check-leaks
+--globals indent
+--require mocha-http-detect
+--exit

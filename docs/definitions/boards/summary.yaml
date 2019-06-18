@@ -1,0 +1,10 @@
+description: Summary of boards
+type: object
+example:
+  boardRegistrations: 2500
+  connectedBoards: 1759
+properties:
+  boardRegistrations:
+    type: number
+  connectedBoards:
+    type: number

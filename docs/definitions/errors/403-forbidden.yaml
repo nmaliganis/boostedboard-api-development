@@ -1,0 +1,9 @@
+description: Forbidden error
+examples:
+  application/json:
+    correlationId: 3f7e7be9
+    name: ForbiddenError
+    type: E_FORBIDDEN
+    message: The user is not allowed to access this resource
+schema:
+  $ref: '../../definitions/errors/error.yaml'

@@ -1,0 +1,17 @@
+{
+  "reporter": [
+    "lcov",
+    "text",
+    "text-summary"
+ ],
+  "include": [
+    "src/**/*.js"
+  ],
+ "exclude": [
+   "src/utils/google-auth.js",
+   "src/common/logger.js",
+   "src/database/migrations/*",
+   "src/config",
+   "src/app.js"
+ ]
+}

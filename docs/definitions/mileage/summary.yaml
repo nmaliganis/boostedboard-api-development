@@ -1,0 +1,16 @@
+description: Summary of mileage
+type: object
+example:
+  totalCount: 323456
+  today: 289
+  last7days: 4289
+  last30days: 14289
+properties:
+  totalCount:
+    type: number
+  today:
+    type: number
+  last7days:
+    type: number
+  last30days:
+    type: number

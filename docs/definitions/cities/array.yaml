@@ -1,0 +1,4 @@
+description: Cities available for events
+type: array
+items:
+  $ref: './object.yaml'

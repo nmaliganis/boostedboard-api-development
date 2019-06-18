@@ -1,0 +1,19 @@
+get:
+  summary: Summary of boards
+  description: Returns count of all registerd and connected boards.
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+  responses:
+    200:
+      $ref: '../../definitions/boards/summary.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Mileage']
+  security:
+    - JWT: []

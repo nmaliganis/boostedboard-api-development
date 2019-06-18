@@ -1,0 +1,46 @@
+decription: Logged user
+type: object
+example:
+  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTUxOTk5NzMzNiwiZXhwIjoxNTE5OTk3Mzk2LCJpc3MiOiJjb20uc3Rydi5ib29zdGVkYm9hcmQtYXBpLmxvY2FsIiwic3ViIjoibG9naW4ifQ.FN9F28nsmuU8nSprcCO6ykKMOprlSG9X41Bc9jeqYjM
+  refreshToken: 3f134d24310214f40ab8102b4934b902e8a764ddabf803700b7f41c1403bc5d9
+  profile:
+    id: 1
+    name: Bruce Wayne
+    email: bruce.wayne@wayneindustries.com
+    gender: Male
+    facebookId: null
+    googleId: 111111111111111111111
+    isEmailVerified: true
+    weight: null
+    height: null
+    pictureUrl: null
+    role: user
+    createdAt: '2018-03-02T10:57:20.992Z'
+    updatedAt: '2018-03-02T10:57:20.992Z'
+    boards:
+      -
+        id: 1
+        serial: S123456789
+        name: Batmobile
+        batterySerial: B123456789
+        motorDriverSerial: M123456789
+        purchaseLocation: Boostedboards.com
+        firmwareVersion: '2.2.1'
+        type: 'Boosted Mini X'
+        createdAt: '2018-01-30T10:12:41.411Z'
+        updatedAt: '2018-01-30T10:12:41.411Z'
+  isNewUser: false
+properties:
+  accessToken:
+    type: string
+  refreshToken:
+    type: string
+  profile:
+    type: object
+  isNewUser:
+    type: boolean
+required:
+- accessToken
+- refreshToken
+- profile
+- isNewUser

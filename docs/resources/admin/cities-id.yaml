@@ -1,0 +1,94 @@
+get:
+  summary: Returns a city
+  description: Returns a city for the provided ID in the path
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: cityId
+      description: Id of a city
+      in: path
+      required: true
+      type: integer
+  responses:
+    200:
+      description: Successful response - Requested city object
+      schema:
+        $ref: '../../definitions/cities/object.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: City with {cityId} doesn't exists
+  tags: ['Admin', 'Cities']
+  security:
+    - JWT: []
+
+patch:
+  summary: Updates an existing city
+  description: Updates name or location of a registered city. Cannot be used to change the test city.
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: cityId
+      description: Id of a city
+      in: path
+      required: true
+      type: integer
+    - name: data
+      description: City information to be updated
+      in: body
+      required: true
+      schema:
+        $ref: '../../definitions/cities/patchReq.yaml'
+  responses:
+    200:
+      description: Successful response - Updated city object
+      schema:
+        $ref: '../../definitions/cities/object.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: City with {cityId} doesn't exists
+    409:
+      description: Another city with the name is already created
+  tags: ['Admin', 'Cities']
+  security:
+    - JWT: []
+
+delete:
+  summary: Deletes an existing city
+  description: Deletes an already existing city - fails if there is an event happening in this city. Also deleting the test city will result in error.
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: cityId
+      description: Id of a city
+      in: path
+      required: true
+      type: integer
+  responses:
+    200:
+      description: Successful response - All cities excluding the deleted one
+      schema:
+        $ref: '../../definitions/cities/array.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: City with {cityId} doesn't exists
+  tags: ['Admin', 'Cities']
+  security:
+    - JWT: []

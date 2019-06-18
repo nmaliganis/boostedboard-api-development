@@ -1,0 +1,9 @@
+description: Earth coordinates in format [longtitude, latitude] (mind the order!)
+type: array
+example: [-122.074997, 37.406819]
+minItems: 2
+maxItems: 2
+items:
+  type: number
+  minimum: -180
+  maximum: 180

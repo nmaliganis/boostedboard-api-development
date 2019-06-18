@@ -1,0 +1,51 @@
+get:
+  summary: List of user Profiles including their Boards
+  description: Returns list of all user Profiles on platform. Including their Boards.
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: offset
+      in: query
+      required: false
+      type: number
+      description: 'Offset for pagination. Default offset is **0**. Required if `limit` parameter is present.'
+    - name: limit
+      in: query
+      required: false
+      type: number
+      description: 'Limit for pagination. Default limit is **10**. Required if `offset` parameter is present.'
+    - name: orderColumn
+      in: query
+      required: false
+      type: string
+      description: 'Column for sorting. Default column is **createdAt**. Allowed values are **createdAt** and **name**. Required if `orderDirection` parameter is present.'
+    - name: orderDirection
+      in: query
+      required: false
+      type: string
+      description: 'Direction for sorting. Default direction is **desc**. Allowed values are **desc** and **asc**. Required if `orderColumn` parameter is present.'
+    - name: searchColumn
+      in: query
+      required: false
+      type: string
+      description: 'Column for searching. Allowed values are **name**, **email**, **createdAt** and **serial**. Required if `searchQuery` parameter is present.'
+    - name: searchQuery
+      in: query
+      required: false
+      type: string
+      description: 'Query for searching. Required if `searchColumn` parameter is present.'
+  responses:
+    200:
+      $ref: '../../definitions/users/array.yaml'
+    400:
+      $ref: '../../definitions/errors/400-validation.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Users']
+  security:
+    - JWT: []

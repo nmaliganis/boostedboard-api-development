@@ -1,0 +1,29 @@
+get:
+  summary: Mileage sum for specified date interval
+  description: Returns sum of all miles in database within date interval
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: from
+      in: query
+      required: false
+      type: string
+      description: 'Limit sum with date boundaries. Date is expected in format **YYYYY-MM-DD**. If param is not present, returned sum is not limited. Required if `to` parameter is present.'
+    - name: to
+      in: query
+      required: false
+      type: string
+      description: 'Limit sum with date boundaries. Date is expected in format **YYYYY-MM-DD**. If param is not present, returned sum is not limited. Required if `from` parameter is present.'
+  responses:
+    200:
+      $ref: '../../definitions/mileage/sum.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Users']
+  security:
+    - JWT: []

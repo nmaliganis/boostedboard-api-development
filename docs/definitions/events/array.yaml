@@ -1,0 +1,4 @@
+description: Array of events
+type: array
+items:
+  $ref: './object.yaml'

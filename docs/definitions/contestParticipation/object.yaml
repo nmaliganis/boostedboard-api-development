@@ -1,0 +1,29 @@
+description: Contest
+type: object
+example:
+  id: 1
+  name: Summer contest 2018
+  accepted: true
+  location: [ 43, 20 ]
+  createdAt: '2018-01-30T10:12:41.411Z'
+  updatedAt: '2018-01-30T10:12:41.411Z'
+properties:
+  contestId:
+    type: integer
+  name:
+    type: string
+  accepted:
+    type: boolean
+  location:
+    type: array
+    items:
+      type: number
+  createdAt:
+    type: string
+    format: datetime
+  updatedAt:
+    type: string
+    format: datetime
+required:
+- id
+- accepted

@@ -1,0 +1,64 @@
+decription: User with Boards
+type: object
+example:
+  id: 1
+  name: Bruce Wayne
+  email: bruce.wayne@wayneindustries.com
+  gender: Male
+  height: 6'2'
+  weight: 210
+  pictureUrl: https://vignette.wikia.nocookie.net/marvel_dc/images/3/33/Batman_002.jpg/revision/latest?cb=20130412165015
+  role: user
+  createdAt: '2018-01-30T10:12:41.411Z'
+  updatedAt: '2018-01-30T10:12:41.411Z'
+  boards:
+    -
+      id: 1
+      serial: S123456789
+      name: Batmobile
+      batterySerial: B123456789
+      motorDriverSerial: M123456789
+      purchaseLocation: Boostedboards.com
+      firmwareVersion: '2.2.1'
+      type: 'Boosted Mini X'
+      createdAt: '2018-01-30T10:12:41.411Z'
+      updatedAt: '2018-01-30T10:12:41.411Z'
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  email:
+    type: string
+  gender:
+    type: string
+  height:
+    type: string
+  weight:
+    type: string
+  pictureUrl:
+    type: string
+  role:
+    type: string
+    enum:
+    - user
+    - admin
+  createdAt:
+    type: string
+    format: datetime
+  updatedAt:
+    type: string
+    format: datetime
+  boards:
+    type: array
+    items:
+      $ref: '../boards/object.yaml'
+required:
+- id
+- name
+- email
+- gender
+- height
+- weight
+- pictureUrl
+- role

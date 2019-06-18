@@ -1,0 +1,44 @@
+description: Board
+type: object
+example:
+  id: 1
+  serial: S123456789
+  name: Batmobile
+  batterySerial: B123456789
+  motorDriverSerial: M123456789
+  purchaseLocation: Boostedboards.com
+  firmwareVersion: '2.2.1'
+  type: 'Boosted Mini X'
+  createdAt: '2018-01-30T10:12:41.411Z'
+  updatedAt: '2018-01-30T10:12:41.411Z'
+properties:
+  id:
+    type: integer
+  serial:
+    type: string
+  name:
+    type: string
+  batterySerial:
+    type: string
+  motorDriverSerial:
+    type: string
+    enum: ['Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board', 'Other']
+  purchaseLocation:
+    type: string
+  firmwareVersion:
+    type: string
+    description: string in the semantic version format - major.minor.patch
+  type:
+    type: string
+  createdAt:
+    type: string
+    format: datetime
+  updatedAt:
+    type: string
+    format: datetime
+required:
+- id
+- serial
+- name
+- batterySerial
+- motorDriverSerial

@@ -1,0 +1,23 @@
+{
+  "name": "boostedboard-api",
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "make migrate",
+        "test": "make test-ci"
+      },
+      "formation": {
+        "test": {
+          "quantity": 1,
+          "size": "standard-1x"
+        }
+      },
+      "addons": [
+        "heroku-postgresql:hobby-dev"
+      ],
+      "env": {
+        "NODE_ENV": "test"
+      }
+    }
+  }
+}

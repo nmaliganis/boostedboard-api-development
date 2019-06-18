@@ -1,0 +1,10 @@
+// see: https://github.com/sequelize/cli
+
+const path = require('path')
+const basePath = './src'
+
+module.exports = {
+  'config': path.resolve(basePath, 'config/sequelize.js'),
+  'migrations-path': path.resolve(basePath, 'database/migrations'),
+  'seeders-path': path.resolve(basePath, 'database/seeders'),
+}

@@ -1,0 +1,99 @@
+get:
+  summary: List of existing events
+  description: Returns list of future and past events in all cities as well as global events
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+  responses:
+    200:
+      description: List of all events
+      schema:
+        type: object
+        properties:
+          events:
+            $ref: '../../definitions/events/array.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Events']
+  security:
+    - JWT: []
+
+post:
+  summary: Creates a new event
+  description: Creates a new event with specified name, description and date in given city. Combination of name/date/city has to be unique.
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: name
+      in: body
+      required: true
+      type: string
+      description: 'Name of the event'
+    - name: description
+      in: body
+      required: true
+      type: string
+      description: 'Description of the event'
+    - name: startDate
+      in: body
+      required: true
+      type: string
+      format: datetime
+      description: Start date of the event
+    - name: endDate
+      in: body
+      required: true
+      type: string
+      format: datetime
+      description: End date of the event
+    - name: cityId
+      in: body
+      required: true
+      type: string
+      description: City in which the event will take place (or null for global events)
+    - name: imageUrl
+      in: body
+      required: false
+      type: string
+      description: URL of an image to be shown. If not provided an image of city will be used or a general picture.
+    - name: link
+      in: body
+      required: false
+      type: object
+      description: An object with 2 properties - text (string) and url (string).
+      properties:
+        - name: text
+          type: string
+          required: true
+          description: Text that will be show to the user for the link
+        - name: url
+          type: string
+          required: true
+          description: Actual URL of the link
+  responses:
+    201:
+      description: List of all events including the newly created
+      schema:
+        type: object
+        properties:
+          events:
+            $ref: '../../definitions/events/array.yaml'
+    400:
+      $ref: '../../definitions/errors/400-validation.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    409:
+      description: Another event with the same name, in the same city and in the same date already exists.
+  tags: ['Admin', 'Events']
+  security:
+    - JWT: []

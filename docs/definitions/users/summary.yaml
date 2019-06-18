@@ -1,0 +1,17 @@
+description: Summary of user profiles
+type: object
+example:
+  totalCount: 1460
+  today: 5
+  last7days: 76
+  last30days: 234
+  boardRegistrations: 1032
+properties:
+  totalCount:
+    type: number
+  today:
+    type: number
+  last7days:
+    type: number
+  last30days:
+    type: number

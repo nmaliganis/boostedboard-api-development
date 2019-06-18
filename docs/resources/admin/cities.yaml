@@ -1,0 +1,70 @@
+get:
+  summary: List of cities for events
+  description: Returns list of all registered cities which can host an event (and locate users within them)
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+  responses:
+    200:
+      description: 'List of cities (that can host an event)'
+      schema:
+      type: object
+      properties:
+        cities:
+          $ref: '../../definitions/cities/array.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Cities']
+  security:
+    - JWT: []
+
+post:
+  summary: Creates a new city
+  description: Creates a new city with specified name and location
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: location
+      in: body
+      required: true
+      description: Earth coordinates in format [longtitude, latitude] (mind the order!)
+      schema:
+        $ref: '../../definitions/common/coordinates.yaml'
+    - name: name
+      in: body
+      required: true
+      type: string
+      description: 'Name of the city'
+    - name: radius
+      in: body
+      required: false
+      type: number
+      description: Radius of the city in meters
+    - name: imageUrl
+      in: body
+      required: false
+      type: string
+      description: URL of an image to be shown in events in this city with no image (fallback)
+  responses:
+    201:
+      description: City created
+      $ref: '../../definitions/cities/object.yaml'
+    400:
+      $ref: '../../definitions/errors/400-validation.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    409:
+      description: Another city with the name is already created
+  tags: ['Admin', 'Cities']
+  security:
+    - JWT: []

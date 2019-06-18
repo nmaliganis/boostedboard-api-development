@@ -1,0 +1,34 @@
+description: City
+type: object
+example:
+  id: 1
+  name: Prague
+  location: [-122.074997, 37.406819]
+  radius: 100000
+  imageUrl: 'http://s3-aws-region.amazonaws.com/bucket/someImageURL'
+  createdAt: '2018-01-30T10:12:41.411Z'
+  updatedAt: '2018-01-30T10:12:41.411Z'
+  timeZone: 'Europe/Prague'
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  radius:
+    type: number
+  location:
+    $ref: '../common/coordinates.yaml'
+  imageUrl:
+    type: string
+  createdAt:
+    type: string
+    format: datetime
+  updatedAt:
+    type: string
+    format: datetime
+  timeZone:
+    type: string
+required:
+- id
+- name
+- location

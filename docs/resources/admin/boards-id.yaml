@@ -1,0 +1,30 @@
+delete:
+  summary: Board deletion
+  description: Deletes a single board
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: boardId
+      description: Id of a board
+      in: path
+      required: true
+      type: integer
+  responses:
+    200:
+      description: Successful response - Updated list of user's boards
+      schema:
+        type: array
+        items:
+          $ref: '../../definitions/boards/object.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: Board with {boardId} doesn't exists
+  tags: ['Admin', 'Boards']
+  security:
+    - JWT: []

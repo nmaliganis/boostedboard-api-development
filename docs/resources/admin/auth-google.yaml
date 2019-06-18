@@ -1,0 +1,17 @@
+post:
+  summary: Login or register user with google
+  description: Login or register user based on google id token. The required scope is `email` and `profile`.
+  parameters:
+    - name: data
+      in: body
+      required: true
+      schema:
+        $ref: '../../definitions/auth/post-google.yaml'
+  responses:
+    200:
+      description: Successful response
+      schema:
+        $ref: '../../definitions/auth/logged-user.yaml'
+    400:
+      description: Bad request
+  tags: ['Admin', 'Auth']

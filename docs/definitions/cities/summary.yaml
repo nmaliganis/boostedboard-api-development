@@ -1,0 +1,13 @@
+description: List of cities including number of their subscribers
+type: object
+properties:
+  summary:
+    type: array
+    items:
+      type: object
+      properties:
+        subscriberCount:
+          type: integer
+          description: Total number of people subscribed to the given city
+        city:
+          $ref: './object.yaml'

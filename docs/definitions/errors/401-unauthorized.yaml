@@ -1,0 +1,9 @@
+description: Unauthorized error
+examples:
+  application/json:
+    correlationId: 794e1da5
+    name: UnauthorizedError
+    type: E_UNAUTHORIZED
+    message: The user was not authorized
+schema:
+  $ref: '../../definitions/errors/error.yaml'

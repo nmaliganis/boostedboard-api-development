@@ -1,0 +1,10 @@
+type: object
+properties:
+  correlationId:
+    type: string
+  name:
+    type: string
+  type:
+    type: string
+  message:
+    type: string

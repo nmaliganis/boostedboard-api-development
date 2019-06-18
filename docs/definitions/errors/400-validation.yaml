@@ -1,0 +1,9 @@
+description: Validation error
+examples:
+  application/json:
+    correlationId: 7871fca0
+    name: ValidationError
+    type: E_VALIDATION
+    message: '"value" contains [offset] without its required peers [limit]'
+schema:
+  $ref: '../../definitions/errors/error.yaml'

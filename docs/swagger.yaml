@@ -1,0 +1,1491 @@
+swagger: '2.0'
+
+info:
+  version: '0.0.1'
+  title: Boosted Boards API
+
+basePath: '/'
+securityDefinitions:
+  JWT:
+    type: 'apiKey'
+    in: 'header'
+    name: 'Authorization'
+
+paths:
+  /users:
+    post:
+      summary: Registeres a user
+      description: Registers a new user. Returned accessToken expires in 24 hour and refreshToken will be usable after user verify his email address.
+      parameters:
+        -
+          name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UserPostReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AuthRes'
+        400:
+          description: Bad request
+        409:
+          description: Conflict record found
+      tags: ['Users']
+
+  /users/me:
+    get:
+      summary: Returns info about currently logged in user
+      description: Returns info about currently logged in user.
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/UserMeGetRes'
+        401:
+          description: Unauthenticated user
+      tags: ['Auth', 'Users']
+      security:
+        - JWT: []
+    patch:
+      summary: Updates currently logged in user
+      description: Updates some values about currently logged in user
+      parameters:
+        - name: data
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/UserMePatchReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/UserMePatchRes'
+        400:
+          description: Wrong request, incorrect password, updating password of Google/Facebook user
+        401:
+          description: Unauthenticated user
+      tags: ['Users']
+      security:
+        - JWT: []
+
+  /users/me/rides:
+    get:
+      summary: Returns rides and rides' statistics of currently logged in user
+      description: Returns rides and rides' statistics of currently logged in user
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          type: integer
+          description: 'Offset for pagination. Defaults to 0.'
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          description: 'Limit for pagination. Defaults to no limit.'
+      responses:
+        200:
+          description: Rides ordered by finished time descending
+          schema:
+            $ref: '#/definitions/UserMeRidesGetRes'
+        401:
+          description: Unauthenticated user
+      tags: ['Users', 'Rides']
+      security:
+        - JWT: []
+
+  /users/verify-email:
+    post:
+      summary: Mark user's email as verifed and log him in
+      description: Mark user's email as verified and return accessToken and refreshToken
+      parameters:
+        - name: data
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/UserVerifyEmailReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AuthRes'
+        401:
+          description: 'Token has expired'
+      tags: ['Users', 'Auth']
+
+  /users/contest:
+    post:
+      deprecated: true
+      summary: Post user contest participation update
+      description: Allows to register or unregister from a specified contest
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UserContestPostReq'
+          description: 'Data related to the registered contest.'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/ContestParticipationRes'
+        400:
+          description: Bad request
+      tags: ['Users', 'Contests']
+      security:
+        - JWT: []
+
+  /users/request-password-reset:
+    post:
+      summary: Send user email to reset a password
+      description: Send user email with link which redirects him to app to reset his forgoten password
+      parameters:
+        - name: data
+          in: body
+          schema:
+            $ref: '#/definitions/UserRequestPasswordResetReq'
+      responses:
+        204:
+          description: Email was sent
+        400:
+          description: Invalid email, user uses facebook/google auth
+        401:
+          description: Email address is not verified
+        404:
+          description: Email address was not found
+      tags: ['Users']
+
+  /users/confirm-password-reset:
+    post:
+      summary: Change user's password based on token
+      description: Changes user's password based on resetPasswordToken from email
+      parameters:
+        - name: data
+          in: body
+          schema:
+            $ref: '#/definitions/UserConfirmPasswordResetReq'
+      responses:
+        204:
+          description: Password changed
+      tags: ['Users']
+
+  /users/push-token:
+    post:
+      summary: Update push token for specified device
+      description: Updates push token for user's device, every device has one unique push token
+      parameters:
+        - name: data
+          in: body
+          description: Token update
+          example:
+            deviceId: 0c657f30-754d-11e8-9282-b3367441593b
+            token: 15ce66e0-754d-11e8-9282-b3367441593b
+          schema:
+            type: object
+            properties:
+              deviceId:
+                type: string
+              token:
+                type: string
+      responses:
+        200:
+          description: Token updated
+        400:
+          description: Invalid input
+        409:
+          description: Token already used
+      tags: ['Users', 'Notifications']
+      security:
+        - JWT: []
+
+  /auth/native:
+    post:
+      summary: Login user with email
+      description: Login user based on email and password.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AuthNativeReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AuthRes'
+        400:
+          description: Bad request
+        401:
+          description: Wrong password
+        404:
+          description: User not found
+      tags: ['Auth']
+
+  /auth/facebook:
+      post:
+        summary: Login or register user with facebook
+        description: Login or register user based on facebook access token
+        parameters:
+          - name: data
+            in: body
+            required: true
+            schema:
+              $ref: '#/definitions/AuthFacebookReq'
+        responses:
+          200:
+            description: Successful response
+            schema:
+              $ref: '#/definitions/AuthRes'
+          400:
+            description: Bad request
+        tags: ['Auth']
+
+  /auth/google:
+    post:
+      summary: Login or register user with google
+      description: Login or register user based on google id token. The required scope is `email` and `profile`.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AuthGoogleReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AuthRes'
+        400:
+          description: Bad request
+      tags: ['Auth']
+
+  /auth/refresh:
+    post:
+      summary: Login user with refresh token
+      description: Login user with refresh token which was previously acquired by other mean of authentication
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AuthRefreshReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AuthRes'
+        400:
+          description: Bad request
+      tags: ['Auth']
+
+  /auth/logout:
+    post:
+      summary: Logs out a user
+      description: Removes user's push token from the DB and cancels all subscriptions for this token from SNS. Notifications wont come to this device anymore
+      parameters:
+        - name: data
+          in: body
+          description: Token
+          example:
+            deviceId: 0c657f30-754d-11e8-9282-b3367441593b
+            token: 15ce66e0-754d-11e8-9282-b3367441593b
+          schema:
+            type: object
+            properties:
+              deviceId:
+                type: string
+              token:
+                type: string
+      responses:
+        204:
+          description: User logged out - push token removed and subscriptions (SNS) canceled
+        400:
+          description: Invalid input
+        404:
+          description: Token not found for that user
+      tags: ['Auth']
+      security:
+        - JWT: []
+
+  /redirect/verify-email:
+    get:
+      summary: Redirect to app to verify email address
+      description: Redirect to `boostedboards://users/verify-email?token=ThisIsToken`. It is expected that application then calls `/users/verify-email` with given token.
+      parameters:
+        - name: token
+          in: query
+          required: true
+          type: string
+      responses:
+        302:
+          description: Location headers is set to intent link
+      tags: ['Redirect']
+
+  /redirect/confirm-password-reset:
+    get:
+      summary: Redirect to app to reset forgoten password
+      description: Redirect to `boostedboards://users/confirm-password-reset?token=ThisIsToken`. It is expected that application then calls `/users/confirm-password-reset` with given token and new password.
+      parameters:
+        - name: token
+          in: query
+          required: true
+          type: string
+      responses:
+        302:
+          description: Location headers is set to intent link
+      tags: ['Redirect']
+
+  /aws/signed-url:
+    post:
+      summary: Returns a signed url which can be used to upload data to S3 with PUT request
+      description: |
+        All the user-uploaded files are stored on AWS S3. To upload the file, first request Signed URL from this endpoint, then send file with HTTP PUT request to that Signed URL.
+        When possible, please specify ContentType as MIME type of file (eg. image/jpeg, video/mp4, ...). If you specify the ContentType, you MUST also include it in HTTP PUT request.
+      parameters:
+        - name: data
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/AWSSignedUrlReq'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AWSSignedUrlRes'
+        400:
+          description: Bad request
+      tags: ['AWS']
+      security:
+        - JWT: []
+
+
+  /boards:
+    post:
+      summary: Registeres a board
+      description: Registers a new board. Returns updated list of all registerd boards for the user.
+      parameters:
+        -
+          name: data
+          description: Board information to be registered. Purchase location can be one from the list 'Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board' or 'Other'. Board type can be one from the list 'unknown', 'single', 'dual', 'dual+', 'plus', 'stealth', 'mini s', 'mini x' or 'rev'.
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/BoardPostReq'
+      responses:
+        200:
+          description: Successful response - Updated list of user's boards
+          schema:
+            $ref: '#/definitions/BoardsRes'
+        400:
+          description: Bad request
+        403:
+          description: Forbidden - User reached limit of maximum number of boards registerd for one user
+        409:
+          description: Conflict record found
+      tags: ['Boards']
+      security:
+        - JWT: []
+
+  /boards/{boardId}:
+    delete:
+      summary: Removes a previously registered board from user's profile
+      parameters:
+        - in: path
+          name: boardId
+          type: string
+          required: true
+          description: Database ID of the board to be deleted
+      responses:
+        200:
+          description: Successful response - Updated list of user's boards
+          schema:
+            $ref: '#/definitions/BoardsRes'
+        404:
+          description: Board with {boardId} doesn't exists or belongs to another user
+      tags: ['Boards']
+      security:
+        - JWT: []
+
+    patch:
+      summary: Update a previously registered board
+      parameters:
+        - in: body
+          name: data
+          description: Board information to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/BoardPatchReq'
+        - in: path
+          name: boardId
+          type: string
+          required: true
+          description: Database ID of the board to be updated
+      responses:
+        200:
+          description: Successful response - Updated board object
+          schema:
+            $ref: '#/definitions/Board'
+        404:
+          description: Board with {boardId} doesn't exists or belongs to another user
+        409:
+          description: Board with the same serial number is alredy registered to another user
+      tags: ['Boards']
+      security:
+        - JWT: []
+
+  /mileage:
+    post:
+      summary: Add a new mileage record
+      description: Registers a new mileage record.
+      parameters:
+        -
+          name: data
+          description: Mileage information to be registered
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MileagePostReq'
+      responses:
+        204:
+          description: Successful response
+      tags: ['Mileage']
+      security:
+        - JWT: []
+
+  /rides:
+    post:
+      summary: Creates a ride
+      description: Creates a new ride which will be associated with currently logged in user. Mind the order of coordinates (lng, lat)!
+      parameters:
+        - name: data
+          description: Rides information
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/RidesPostReq'
+      responses:
+        201:
+          description: Successful response - Created ride
+          schema:
+            $ref: '#/definitions/Ride'
+        400:
+          description: Bad request
+      tags: ['Rides']
+      security:
+          - JWT: []
+
+  /rides/{rideId}:
+    delete:
+      summary: Deletes a ride
+      description: Deletes a ride of currently logged-in user specified in path
+      parameters:
+        - name: rideId
+          description: Id of ride
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Successful response - Ride was deleted, empty response
+        400:
+          description: Bad request
+        401:
+          description: Unauhtorized
+        404:
+          description: Ride was not found or is associated with another user
+      tags: ['Rides']
+      security:
+          - JWT: []
+
+  /rides/{rideId}/shared:
+    post:
+      summary: Marks a ride as shared
+      description: Marks a ride as shared, should be called after sharing to social network
+      parameters:
+        - name: rideId
+          description: Id of ride
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Successful response - Updated ride
+          schema:
+            $ref: '#/definitions/Ride'
+        400:
+          description: Bad request
+        401:
+          description: Unauhtorized
+        404:
+          description: Ride was not found or is associated with another user
+      tags: ['Rides']
+      security:
+          - JWT: []
+
+  /spots:
+    post:
+      deprecated: true
+      summary: Creates a spot. DO NOT USE, Not completly implemented, check README.
+      description: Creates a new spot which will be associated with currently logged in user.
+      parameters:
+        - name: data
+          description: Spot information
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SpotsPostReq'
+      responses:
+        201:
+          description: Successful response - Created spot
+          schema:
+            $ref: '#/definitions/Spot'
+        400:
+          description: Bad request
+      tags: ['Spots']
+      security:
+          - JWT: []
+    get:
+      deprecated: true
+      summary: Gets spots in a radius. DO NOT USE, Not completly implemented, check README.
+      description: Returns spots in a defined radius around center point
+      parameters:
+        - name: lat
+          description: Latitude of center point
+          in: query
+          required: true
+          type: number
+          minimum: -90
+          maximum: 90
+        - name: lng
+          description: Longtitude of center point
+          in: query
+          required: true
+          type: number
+          minimum: -180
+          maximum: 180
+        - name: radius
+          description: How far to search in meters
+          in: query
+          required: true
+          type: number
+          minimum: 0
+        - name: type
+          description: What type of spots to return. If not specified, all types are returned
+          in: query
+          required: false
+          type: string
+          enum: [charging, hazard]
+      responses:
+        200:
+          description: Found spots
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Spot'
+        400:
+          description: Wrong format of query
+      tags: ['Spots']
+
+  /spots/{spotId}:
+    get:
+      deprecated: true
+      summary: Fetch a spot info. DO NOT USE, Not completly implemented, check README.
+      description: Fetches info about a specific spot
+      parameters:
+        - name: spotId
+          description: ID of spot
+          in: path
+          required: true
+          type: integer
+      responses:
+        201:
+          description: Successful response - Spot
+          schema:
+            $ref: '#/definitions/Spot'
+        404:
+          description: Spot not found
+      tags: ['Spots']
+    delete:
+      deprecated: true
+      summary: Deletes a spot. DO NOT USE, Not completly implemented, check README.
+      description: Deletes a spot from the database
+      parameters:
+        - name: spotId
+          description: ID of spot
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Successful response - Spot deleted
+        404:
+          description: Spot not found or is not associated with current user
+      tags: ['Spots']
+      security:
+          - JWT: []
+
+  /cities:
+    get:
+      summary: List of cities
+      description: Returns list of all cities the user can subscribe to (filtering out already subscribed onces). The list is ordered alphabetically, when location (long & lat) is provided the cities are sorted by distance from that point (closest first)
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          description: 'Bearer ACCESS_TOKEN_VALUE'
+        - name: long
+          description: Longitude part of user's curent location
+          in: query
+          required: true
+          type: number
+          minimum: -180
+          maximum: 180
+        - name: lat
+          description: Latitude part of user's curent location
+          in: query
+          required: true
+          type: number
+          minimum: -180
+          maximum: 180
+      responses:
+        200:
+          description: 'List of cities'
+          schema:
+          type: object
+          properties:
+            cities:
+              $ref: './definitions/cities/array.yaml'
+        401:
+          $ref: './definitions/errors/401-unauthorized.yaml'
+      tags: ['Cities']
+      security:
+        - JWT: []
+
+  /cities/location:
+    get:
+      summary: Returns a city of a current location
+      description: Check for the given latitude and longitude and returns a city in which is the user/device is located. If user is in an intersection of more cities the closer will be used. If user is in no city null is returned (currentLocation is set to null)
+      parameters:
+        - name: long
+          description: Longitude part of user's curent location
+          in: query
+          required: true
+          type: number
+          minimum: -180
+          maximum: 180
+        - name: lat
+          description: Latitude part of user's curent location
+          in: query
+          required: true
+          type: number
+          minimum: -180
+          maximum: 180
+      responses:
+        200:
+          description: Successful response - Current location (city or currentLocation set to null for no city)
+          schema:
+            $ref: '#/definitions/CitiesLocationRes'
+        400:
+          description: Bad request
+        401:
+          description: Unauhtorized
+      tags: ['Cities']
+      security:
+        - JWT: []
+
+  /cities/subscriptions:
+    get:
+      summary: Lists subscriptions
+      description: Return list of cities for which the user has subscribed.
+      responses:
+        200:
+          description: Successful response - Array of cities the user has subscriber for
+          schema:
+            type: object
+            properties:
+              subscribedCities:
+                $ref: './definitions/cities/array.yaml'
+        401:
+          description: Unauhtorized
+        404:
+          description: User does not exists
+      tags: ['Cities']
+      security:
+        - JWT: []
+
+    post:
+      summary: Subscribe for a city
+      description: Subscribes user to a given city to recieves notifications about upcoming events in those locations.
+      parameters:
+        - in: body
+          name: cityId
+          type: integer
+          required: true
+          description: Database ID of the city to subscribe
+      responses:
+        200:
+          description: Successful response - Updated array of cities the user has subscriber for
+          schema:
+            type: object
+            properties:
+              subscribedCities:
+                $ref: './definitions/cities/array.yaml'
+        400:
+          description: Bad request
+        401:
+          description: Unauhtorized
+        409:
+          description: Conflict
+      tags: ['Cities']
+      security:
+        - JWT: []
+
+  /cities/subscriptions/{cityId}:
+    delete:
+      summary: Unsubscribe from a city
+      description: Deletes subscription of user to a given city. He will no longer receive notifications but his former subscription will be remembered for badges/achievments.
+      parameters:
+        - in: path
+          name: cityId
+          type: integer
+          required: true
+          description: Database ID of the city to unsubscribe
+      responses:
+        200:
+          description: Successful response - Updated array of cities the user has subscriber for
+          schema:
+            type: object
+            properties:
+              subscribedCities:
+                $ref: './definitions/cities/array.yaml'
+        401:
+          description: Unauhtorized
+        404:
+          description: Subscription does not exist
+      tags: ['Cities']
+      security:
+        - JWT: []
+
+  /events:
+    get:
+      summary: Upcoming events
+      description: Returns a list of upcoming events which user has signed up for, rejected or events that are in a cities he is subscribed to.
+      responses:
+        200:
+          description: List of relevant events
+          schema:
+            type: object
+            properties:
+              events:
+                $ref: './definitions/events/array.yaml'
+        401:
+          description: Unauhtorized
+      tags: ['Events']
+      security:
+        - JWT: []
+
+  /events/registrations:
+    post:
+      summary: Respond to an event
+      description: Claim to go to an event or declare not going. Also can be used when user has change his mind.
+      parameters:
+        - in: body
+          name: eventId
+          type: integer
+          required: true
+          description: Database ID of the event to register
+        - in: body
+          name: going
+          type: boolean
+          required: true
+          description: Info whether the user is attending or planning not to.
+      responses:
+        200:
+          description: The event user registered (unregistered) for
+          schema:
+            type: object
+            properties:
+              registeredEvent:
+                $ref: './definitions/events/object.yaml'
+        400:
+          description: Bad request
+        401:
+          description: Unauhtorized
+        404:
+          description:
+      tags: ['Events']
+      security:
+        - JWT: []
+
+  /events/{eventId}:
+    get:
+      summary: Returns an event
+      description: Returns an event for the provided ID in the path
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          description: 'Bearer ACCESS_TOKEN_VALUE'
+        - name: eventId
+          description: Id of an event
+          in: path
+          required: true
+          type: integer
+        - name: read
+          description: Flag - if set to true the event for the given user will be also change its state to 'seen'. Setting false is same as ommiting the parameter. Deleted events will keep their state 'deleted'
+          in: query
+          required: false
+          type: boolean
+      responses:
+        200:
+          description: Successful response - Requested event object
+          schema:
+            $ref: './definitions/events/object.yaml'
+        401:
+          $ref: './definitions/errors/401-unauthorized.yaml'
+        403:
+          $ref: './definitions/errors/403-forbidden.yaml'
+        404:
+          description: Event with {eventId} doesn't exists
+      tags: ['Events']
+      security:
+        - JWT: []
+
+  /inbox:
+    get:
+      summary: Inbox messages for a giver user
+      description: Returns a list of marketing messages and list of upcoming events which user has signed up for, rejected or events that are in a cities he is subscribed to. Each message in the inbox has field 'messageState' that can contain the following values - new, seen, deleted.
+      responses:
+        200:
+          description: List of events and marketing messages
+          schema:
+            $ref: './definitions/inbox/object.yaml'
+        401:
+          description: Unauhtorized
+      tags: ['Inbox']
+      security:
+        - JWT: []
+
+  /inbox/message-interaction:
+    post:
+      summary: Mark message as read
+      description: Calling this endpoind will mark an inbox message (Event or other types in the future) as read and will not show a number for this message in the inbox icon. Only one ID can be send in a single request (either event or other allowed type)
+      parameters:
+        - in: body
+          name: messageId
+          type: object
+          required: true
+          description: Object containing one property (for now only 'eventId' is supported) and an ID of the referenced message (event for now)
+          schema:
+            type: object
+            properties:
+              eventId:
+                type: integer
+            example:
+              eventId: 2
+        - in: body
+          name: messageState
+          type: string
+          required: true
+          description: New state of the message for the user in his inbox. Can be either 'seen' or 'deleted'.
+      responses:
+        201:
+          description: Updated inbox - list of events and marketing messages
+          schema:
+            $ref: './definitions/inbox/object.yaml'
+        401:
+          description: Unauhtorized
+        404:
+          description: Event does not exist
+        409:
+          description: Trying to set the same state to a message again (seen to already opened message or deleted to already deleted message)
+      tags: ['Inbox']
+      security:
+        - JWT: []
+
+
+  /admin/auth/google:
+    $ref: './resources/admin/auth-google.yaml'
+  /admin/boards/count:
+    $ref: './resources/admin/boards-count.yaml'
+  /admin/boards/summary:
+    $ref: './resources/admin/boards-summary.yaml'
+  /admin/boards/{boardId}:
+    $ref: './resources/admin/boards-id.yaml'
+  /admin/users:
+    $ref: './resources/admin/users.yaml'
+  /admin/users/{userId}:
+    $ref: './resources/admin/users-id.yaml'
+  /admin/users/count:
+    $ref: './resources/admin/users-count.yaml'
+  /admin/users/summary:
+    $ref: './resources/admin/users-summary.yaml'
+  /admin/mileage/sum:
+    $ref: './resources/admin/mileage-sum.yaml'
+  /admin/contests/summary:
+    $ref: './resources/admin/contests-summary.yaml'
+  /admin/cities:
+    $ref: './resources/admin/cities.yaml'
+  /admin/cities/{cityId}:
+    $ref: './resources/admin/cities-id.yaml'
+  /admin/cities/summary:
+    $ref: './resources/admin/cities-summary.yaml'
+  /admin/events:
+    $ref: './resources/admin/events.yaml'
+  /admin/events/{eventId}:
+    $ref: './resources/admin/events-id.yaml'
+
+definitions:
+  UserPostReq:
+    type: object
+    required: [email, password, name]
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+        minLength: 8
+      name:
+        type: stringSpotsPostReq
+
+  BoardPostReq:
+    type: object
+    required: [serial, name]
+    properties:
+      serial:
+        type: string
+        minLength: 9
+        maxLength: 9
+      batterySerial:
+        type: string
+      motorDriverSerial:
+        type: string
+        enum: ['Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board', 'Other']
+      name:
+        type: string
+        minLength: 3
+      purchaseLocation:
+        type: string
+      firmwareVersion:
+        type: string
+      type:
+        type: string
+
+  BoardPatchReq:
+    type: object
+    properties:
+      serial:
+        type: string
+        minLength: 9
+        maxLength: 9
+      batterySerial:
+        type: string
+      motorDriverSerial:
+        type: string
+        enum: ['Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board', 'Other']
+      name:
+        type: string
+        minLength: 3
+      purchaseLocation:
+        type: string
+      firmwareVersion:
+        type: string
+      type:
+        type: string
+
+  MileagePostReq:
+    type: object
+    required: [odometerTotal, odometerDifference, differenceSince]
+    properties:
+      boardId:
+        type: string
+      odometerTotal:
+        type: number
+        description: Current value of a board odometer in kilometers
+      odometerDifference:
+        type: number
+        description: Difference in odometer value since last record in kilometers
+      differenceSince:
+        type: string
+        format: date-time
+        desctiption: Timestamp of the previous mileage record in ISO 8601 format
+
+  UserPostRes:
+    type: object
+    properties:
+      profile:
+        $ref: '#/definitions/UserProfile'
+
+  UserMeGetRes:
+    type: object
+    properties:
+      profile:
+        $ref: '#/definitions/UserProfile'
+
+  UserMeRidesGetRes:
+    type: object
+    properties:
+      rides:
+        type: array
+        items:
+          $ref: '#/definitions/Ride'
+      stats:
+        type: object
+        properties:
+          count:
+            type: integer
+            description: Number of user's rides
+          sumMapDistance:
+            type: number
+            description: Sum of mapDistance of all user's rides
+          sumBoardDistance:
+            type: number
+            description: Sum of boardDistance of all user's rides
+
+  UserMePatchReq:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 3
+      weight:
+        description: Weight of the user in kilograms
+        type: integer
+      height:
+        description: Height of the user in centimeters
+        type: integer
+      gender:
+        type: string
+        enum:
+          - male
+          - female
+          - other
+      pictureUrl:
+        type: string
+      oldPassword:
+        type: string
+      newPassword:
+        type: string
+        minLength: 8
+
+  UserMePatchRes:
+    type: object
+    properties:
+      profile:
+        $ref: '#/definitions/UserProfile'
+
+  UserVerifyEmailReq:
+    type: object
+    properties:
+      emailVerificationToken:
+        type: string
+
+  UserContestPostReq:
+    type: object
+    properties:
+      contestId:
+        type: integer
+      name:
+        type: string
+      accepted:
+        type: boolean
+      location:
+        type: array
+        items:
+          type: number
+
+  UserRequestPasswordResetReq:
+    type: object
+    properties:
+      email:
+        type: string
+
+  UserConfirmPasswordResetReq:
+    type: object
+    required: [passwordResetToken, newPassword]
+    properties:
+      passwordResetToken:
+        type: string
+      newPassword:
+        type: string
+        minLength: 8
+
+  AuthRes:
+    type: object
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+      isNewUser:
+        type: boolean
+      profile:
+        $ref: '#/definitions/UserProfile'
+
+  ContestParticipationRes:
+    type: object
+    properties:
+      contest:
+        type: object
+        properties:
+          contestId:
+            type: integer
+          name:
+            type: string
+          accepted:
+            type: boolean
+          location:
+            type: array
+            items:
+              type: number
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+
+  AuthNativeReq:
+    type: object
+    required: [email, password]
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+
+  AuthFacebookReq:
+    type: object
+    required: [facebookAccessToken]
+    properties:
+      facebookAccessToken:
+        type: string
+
+  AuthGoogleReq:
+    type: object
+    required: [googleIdToken]
+    properties:
+      googleIdToken:
+        type: string
+
+  AuthRefreshReq:
+    type: object
+    required: [refreshToken]
+    properties:
+      refreshToken:
+        type: string
+
+  UserProfile:
+    type: object
+    properties:
+      id:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+      facebookId:
+        type: string
+      googleId:
+        type: string
+      isEmailVerified:
+        type: boolean
+      weight:
+        description: Weight of the user in kilograms
+        type: integer
+      height:
+        description: Height of the user in centimeters
+        type: integer
+      gender:
+        type: string
+        enum:
+          - male
+          - female
+          - other
+      pictureUrl:
+        type: string
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+      boards:
+        $ref: '#/definitions/BoardsWithFWUpdateRes'
+      subscribedCities:
+        $ref: './definitions/cities/array.yaml'
+
+  BoardsRes:
+    type: array
+    items:
+      $ref: '#/definitions/Board'
+
+  BoardsWithFWUpdateRes:
+    type: array
+    items:
+      $ref: '#/definitions/BoardWithFWUpdate'
+
+  Board:
+    type: object
+    properties:
+      id:
+        type: string
+      serial:
+        type: string
+      batterySerial:
+        type: string
+      motorDriverSerial:
+        type: string
+        enum: ['Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board', 'Other']
+      name:
+        type: string
+      purchaseLocation:
+        type: string
+      firmwareVersion:
+        type: string
+      type:
+        type: string
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+
+  BoardWithFWUpdate:
+    type: object
+    properties:
+      id:
+        type: string
+      serial:
+        type: string
+      batterySerial:
+        type: string
+      motorDriverSerial:
+        type: string
+        enum: ['Boostedboards.com', 'Amazon', 'Best Buy', 'Retail Store', 'Used board', 'Other']
+      name:
+        type: string
+      purchaseLocation:
+        type: string
+      firmwareVersion:
+        type: string
+      type:
+        type: string
+      firmwareUpdateAvailable:
+        type: string
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+
+  RidesPostReq:
+    type: object
+    required: [startTime, endTime, distance, averageSpeed, mapTopSpeed, breadcrumbs]
+    properties:
+      boardId:
+        $ref: '#/definitions/Ride/properties/boardId'
+      startTime:
+        $ref: '#/definitions/Ride/properties/startTime'
+      endTime:
+        $ref: '#/definitions/Ride/properties/endTime'
+      mapDistance:
+        $ref: '#/definitions/Ride/properties/mapDistance'
+      mapAverageSpeed:
+        $ref: '#/definitions/Ride/properties/mapAverageSpeed'
+      boardDistance:
+        $ref: '#/definitions/Ride/properties/boardDistance'
+      boardAverageSpeed:
+        $ref: '#/definitions/Ride/properties/boardAverageSpeed'
+      mapTopSpeed:
+        $ref: '#/definitions/Ride/properties/mapTopSpeed'
+      boardTopSpeed:
+        $ref: '#/definitions/Ride/properties/boardTopSpeed'
+      odometerStart:
+        $ref: '#/definitions/Ride/properties/odometerStart'
+      odometerFinish:
+        $ref: '#/definitions/Ride/properties/odometerFinish'
+      breadcrumbs:
+        $ref: '#/definitions/BreadcrumbsInAPI'
+
+
+  Ride:
+    type: object
+    required: [id, startTime, finishTime, distance, averageSpeed, mapTopSpeed, breadcrumbs, createdAt, updatedAt]
+    properties:
+      id:
+        type: integer
+      userId:
+        type: integer
+        description: Id of user who took the ride
+      boardId:
+        type: integer
+        description: Id of board which was used for the ride
+      startTime:
+        type: string
+        format: date-time
+        description: ISO 8601 formated time of ride's start
+      endTime:
+        type: string
+        format: date-time
+        description: ISO 8601 formated time of ride's end
+      mapDistance:
+        type: number
+        description: Distance of the ride in meters, provided by mobile application, read from GPS
+      mapAverageSpeed:
+        type: number
+        description: Average speed of the ride in meters/second, provided by mobile app, read from GPS
+      boardDistance:
+        type: number
+        description: Distance of the ride in meters, provided by mobile application, read from board
+      boardAverageSpeed:
+        type: number
+        description: Average speed of the ride in meters/second, provided by mobile app, read from board
+      mapTopSpeed:
+        type: number
+        description: Top speed of the ride in meters/second, provided by mobile app, read from GPS
+      boardTopSpeed:
+        type: number
+        description: Top speed of the ride in meters/second, provided by mobile app, read from board
+      odometerStart:
+        type: number
+        description: Value of odometer in meters on the start of the ride
+      odometerFinish:
+        type: number
+        description: Value of odometer in meters on the end of the ride
+      shared:
+        type: boolean
+        description: Tells, if the ride was shared to social network
+      breadcrumbs:
+        $ref: '#/definitions/BreadcrumbsInAPI'
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+
+  Breadcrumb:
+    type: object
+    properties:
+      id:
+        type: string
+      rideId:
+        type: integer
+      timestamp:
+        type: string
+        format: date-time
+      location:
+        $ref: '#/definitions/Coordinates'
+      altitude:
+        type: number
+        description: Altitude in meters above sea
+      boardSpeed:
+        type: number
+        description: Current speed in meters/second, provided by mobile app, read from board
+      boardBatteryRemaining:
+        type: integer
+        description: Current board battery remaining in %, set only when changed
+      boardPowerOutput:
+        type: number
+#       TODO: add unit
+        description: Current board power output in (TODO)
+      boardMode:
+        type: string
+        enum: [beginner, eco, expert, pro, hyper]
+        description: Current board performance mode, set only when changed
+      alternativeMove:
+        type: boolean
+        default: false
+        description: Specifies if the user is currently using alternative move (true) or is riding board (false)
+
+  BreadcrumbsInAPI:
+    type: array
+    items:
+      type: object
+      required: [timestamp, location, altitude]
+      properties:
+        timestamp:
+          $ref: '#/definitions/Breadcrumb/properties/timestamp'
+        location:
+          $ref: '#/definitions/Breadcrumb/properties/location'
+        altitude:
+          $ref: '#/definitions/Breadcrumb/properties/altitude'
+        boardSpeed:
+          $ref: '#/definitions/Breadcrumb/properties/boardSpeed'
+        boardBatteryRemaining:
+          $ref: '#/definitions/Breadcrumb/properties/boardBatteryRemaining'
+        boardPowerOutput:
+          $ref: '#/definitions/Breadcrumb/properties/boardPowerOutput'
+        boardMode:
+          $ref: '#/definitions/Breadcrumb/properties/boardMode'
+        alternativeMove:
+          $ref: '#/definitions/Breadcrumb/properties/alternativeMove'
+
+  SpotsPostReq:
+    type: object
+    required: [type, location]
+    properties:
+      type:
+        $ref: '#/definitions/Spot/properties/type'
+      location:
+        $ref: '#/definitions/Spot/properties/location'
+
+  Spot:
+    type: object
+    required: [id, type, location, userId, createdAt, updatedAt]
+    properties:
+      id:
+        type: integer
+      type:
+        type: string
+        enum: [charging, hazard]
+      location:
+        $ref: '#/definitions/Coordinates'
+      userId:
+        type: integer
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+
+  Coordinates:
+    type: array
+    example: [-122.074997, 37.406819]
+    description: Earth coordinates in format [longtitude, latitude] (mind the order!)
+    minItems: 2
+    maxItems: 2
+    items:
+      type: number
+      minimum: -180
+      maximum: 180
+
+  AWSSignedUrlReq:
+    type: object
+    properties:
+      contentType:
+        type: string
+        description: eg. image/jpeg, video/mp4, ...
+
+  AWSSignedUrlRes:
+    type: object
+    required: [signedUrl]
+    properties:
+      signedUrl:
+        type: string
+        description: URL on which you should upload file. The URL will expiry in 10 minutes
+
+  CitiesLocationRes:
+    type: object
+    properties:
+      currentLocation:
+        $ref: './definitions/cities/object.yaml'

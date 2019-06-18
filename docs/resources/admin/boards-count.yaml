@@ -1,0 +1,19 @@
+get:
+  summary: Total number of registered boards
+  description: Returns count of all boards in database
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+  responses:
+    200:
+      $ref: '../../definitions/boards/count.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Boards']
+  security:
+    - JWT: []

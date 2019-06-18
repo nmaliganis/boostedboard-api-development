@@ -1,0 +1,26 @@
+type: object
+properties:
+  name:
+    type: string
+  description:
+    type: string
+  startDate:
+    type: string
+    format: datetime
+  endDate:
+    type: string
+    format: datetime
+  location:
+    type: string
+  cityId:
+    type: integer
+  imageUrl:
+    type: string
+  link:
+    type: object
+    properties:
+      text:
+        type: string
+      url:
+        type: string
+        format: uri

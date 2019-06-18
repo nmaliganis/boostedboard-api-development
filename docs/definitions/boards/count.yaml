@@ -1,0 +1,7 @@
+description: Count of all registered boards
+type: object
+example:
+  count: 1
+properties:
+  count:
+    type: number

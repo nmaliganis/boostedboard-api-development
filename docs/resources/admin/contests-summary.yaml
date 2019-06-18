@@ -1,0 +1,29 @@
+post:
+  deprecated: true
+  summary: Summary of contest
+  description: Returns aggregated data regarding the contests
+  parameters:
+    - in: body
+      description: base64 encoded csv file containing event data
+      name: date
+      type: object
+      required: true
+      schema:
+        type: object
+        properties:
+          base64:
+            type: string
+  responses:
+    200:
+      description: Summary of contests data
+      type: object
+      properties:
+        csv:
+          type: string
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Contests']
+  security:
+    - JWT: []

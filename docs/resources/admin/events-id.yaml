@@ -1,0 +1,92 @@
+get:
+  summary: Returns an event
+  description: Returns an event for the provided ID in the path
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: eventId
+      description: Id of an event
+      in: path
+      required: true
+      type: integer
+  responses:
+    200:
+      description: Successful response - Requested event object
+      schema:
+        $ref: '../../definitions/events/object.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: Event with {eventId} doesn't exists
+  tags: ['Admin', 'Events']
+  security:
+    - JWT: []
+
+patch:
+  summary: Updates an existing event
+  description: Updates name or description or a date of an existing event
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: eventId
+      description: Id of an event
+      in: path
+      required: true
+      type: integer
+    - name: data
+      description: Event information to be updated
+      in: body
+      required: true
+      schema:
+        $ref: '../../definitions/events/patchReq.yaml'
+  responses:
+    200:
+      description: Successful response - Updated event object
+      schema:
+        $ref: '../../definitions/events/object.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: Event with {eventId} doesn't exists
+  tags: ['Admin', 'Events']
+  security:
+    - JWT: []
+
+delete:
+  summary: Deletes an existing event
+  description: Deletes an already existing event
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: eventId
+      description: Id of an event
+      in: path
+      required: true
+      type: integer
+  responses:
+    200:
+      description: Successful response - All events excluding the deleted one
+      schema:
+        $ref: '../../definitions/events/array.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: Event with {eventId} doesn't exists
+  tags: ['Admin', 'Events']
+  security:
+    - JWT: []

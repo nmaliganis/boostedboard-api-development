@@ -1,0 +1,49 @@
+description: Event
+type: object
+example:
+  id: 1
+  name: Prague is getting boosted
+  description: Boosted board are coming to Prague! Are you ready? Come to our store opening and win a free board signed by Sia
+  date: '2018-01-30T00:00:00.000Z'
+  createdAt: '2018-01-30T10:12:41.411Z'
+  updatedAt: '2018-01-30T10:12:41.411Z'
+  city:
+    id: 2
+    name: Prague
+    timeZone: 'Europe/Prague'
+  imageUrl: 'http://s3-aws-region.amazonaws.com/bucket/someImageURL'
+  messageState: 'seen'
+properties:
+  id:
+    type: integer
+  name:
+    type: string
+  description:
+    type: string
+  date:
+    type: string
+    format: datetime
+  createdAt:
+    type: string
+    format: datetime
+  updatedAt:
+    type: string
+    format: datetime
+  city:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  imageUrl:
+    type: string
+  messageState:
+    type: string
+    description: Information whether the user has already seen/opened the message ('seen') or deleted the message ('deleted'). Otherwise the message is marked as 'new'
+
+required:
+- id
+- name
+- description
+- date

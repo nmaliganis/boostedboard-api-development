@@ -1,0 +1,26 @@
+delete:
+  summary: User deletion
+  description: Deletes a single user and his/her boards
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: userId
+      description: Id of a user
+      in: path
+      required: true
+      type: integer
+  responses:
+    204:
+      description: User and his/her boards have been deleted
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+    404:
+      description: User with {userId} doesn't exists
+  tags: ['Admin', 'Users']
+  security:
+    - JWT: []

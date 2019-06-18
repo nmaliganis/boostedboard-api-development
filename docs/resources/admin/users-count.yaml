@@ -1,0 +1,29 @@
+get:
+  summary: Total number of user profiles
+  description: Returns count of all users in database
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+    - name: from
+      in: query
+      required: false
+      type: string
+      description: 'Limit count with date boundaries. Date is expected in format **YYYYY-MM-DD**. If param is not present, returned count is not limited. Required if `to` parameter is present.'
+    - name: to
+      in: query
+      required: false
+      type: string
+      description: 'Limit count with date boundaries. Date is expected in format **YYYYY-MM-DD**. If param is not present, returned count is not limited. Required if `from` parameter is present.'
+  responses:
+    200:
+      $ref: '../../definitions/users/count.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Users']
+  security:
+    - JWT: []

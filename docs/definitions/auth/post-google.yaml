@@ -1,0 +1,7 @@
+description: Sign in using Google OAUTH
+type: object
+required:
+- googleIdToken
+properties:
+  googleIdToken:
+    type: string

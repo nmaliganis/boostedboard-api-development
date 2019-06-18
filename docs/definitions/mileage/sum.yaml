@@ -1,0 +1,7 @@
+description: Sum of all miles
+type: object
+example:
+  sum: 100
+properties:
+  sum:
+    type: number

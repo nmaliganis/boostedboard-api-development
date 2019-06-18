@@ -1,0 +1,19 @@
+get:
+  summary: Summary of user profiles
+  description: Returns counts of all users registered in last 30 days, 7 days and today
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      type: string
+      description: 'Bearer ACCESS_TOKEN_VALUE'
+  responses:
+    200:
+      $ref: '../../definitions/users/summary.yaml'
+    401:
+      $ref: '../../definitions/errors/401-unauthorized.yaml'
+    403:
+      $ref: '../../definitions/errors/403-forbidden.yaml'
+  tags: ['Admin', 'Users']
+  security:
+    - JWT: []

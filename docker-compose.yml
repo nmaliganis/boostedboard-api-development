@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+  # Configure a database service in a container
+  database:
+    image: mdillon/postgis:9.6
+    container_name: boostedboard-database
+    environment:
+    - PG_TRUST_LOCALNET=true
+    ports:
+    - 5432:5432
+    volumes:
+    - ./docker/database/initdb.d:/docker-entrypoint-initdb.d
+    - database-storage:/var/lib/postgresql
+
+volumes:
+  database-storage:
